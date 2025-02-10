@@ -35,6 +35,12 @@ public class TaskService {
         return tasks;
     }
 
+    public Optional<Task> getTaskById(int id) {
+        return tasks.stream()
+                .filter(task -> task.getId() == id)
+                .findFirst();
+    }
+
     public void editTask(
             int id,
             Optional<String> name,
@@ -42,22 +48,24 @@ public class TaskService {
             Optional<TaskStatus> status,
             Optional<LocalDate> dueDate
     ) {
-        if (id >= 0 && id < tasks.size()) {
-            Task task = tasks.get(id);
+        Optional<Task> optionalTask = getTaskById(id);
+        if (optionalTask.isPresent()) {
+            Task task = optionalTask.get();
             name.ifPresent(task::setName);
             description.ifPresent(task::setDescription);
             status.ifPresent(task::setStatus);
             dueDate.ifPresent(task::setDueDate);
         } else {
-            System.out.println("Invalid task id.");
+            System.out.println("Task with id " + id + " not found");
         }
     }
 
     public void deleteTaskById(int id) {
-        if (id >= 0 && id < tasks.size()) {
-            tasks.remove(id);
+        Optional<Task> task = getTaskById(id);
+        if (task.isPresent()) {
+            tasks.remove(task.get());
         } else {
-            System.out.println("Invalid task id.");
+            System.out.println("Task with id " + id + " not found");
         }
     }
 
@@ -66,8 +74,7 @@ public class TaskService {
                 .filter(task -> task.getStatus().equals(status))
                 .toList();
         if (filteredTasks.isEmpty()) {
-            throw new IllegalArgumentException("Task with status %s not found."
-                    .formatted(status));
+            System.out.println("No tasks found.");
         }
         return filteredTasks;
     }
