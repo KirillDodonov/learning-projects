@@ -1,18 +1,16 @@
-package org.ru.dodonov;
+package org.ru.dodonov.task;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @ToString
 public class Task {
-    long id;
+    int id;
     String name;
     String description;
     TaskStatus status;

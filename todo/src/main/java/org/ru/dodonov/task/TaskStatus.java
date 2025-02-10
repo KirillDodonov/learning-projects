@@ -1,4 +1,4 @@
-package org.ru.dodonov;
+package org.ru.dodonov.task;
 
 public enum TaskStatus {
     TODO,
