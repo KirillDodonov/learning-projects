@@ -10,9 +10,9 @@ import java.time.LocalDate;
 @Setter
 @ToString
 public class Task {
-    int id;
-    String name;
-    String description;
-    TaskStatus status;
-    LocalDate dueDate;
+    private int id;
+    private String name;
+    private String description;
+    private TaskStatus status;
+    private LocalDate dueDate;
 }

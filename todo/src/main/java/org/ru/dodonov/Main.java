@@ -8,16 +8,21 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class Main {
-    private static Scanner scanner = new Scanner(System.in);
-    private static TaskService taskService = new TaskService();
+    private Scanner scanner = new Scanner(System.in);
+    private TaskService taskService = new TaskService();
 
     public static void main(String[] args) {
+        Main main = new Main();
+        main.listenCommands();
+    }
+
+    private void listenCommands() {
         while (true) {
             System.out.println("Enter command:");
             String command = scanner.nextLine();
             switch (command) {
                 case "add" -> handleAddCommand();
-                case "list" -> handleGetAllTasksCommand();
+                case "list" -> handlePrintAllTasksCommand();
                 case "edit" -> handleEditCommand();
                 case "delete" -> handleDeleteCommand();
                 case "filter" -> handleFilterCommand();
@@ -31,7 +36,7 @@ public class Main {
         }
     }
 
-    private static void handleAddCommand() {
+    private void handleAddCommand() {
         System.out.println("Enter task name:");
         String name = scanner.nextLine();
         if (name.length() < 3) {
@@ -50,12 +55,12 @@ public class Main {
         System.out.println("Task added.");
     }
 
-    private static void handleGetAllTasksCommand() {
+    private void handlePrintAllTasksCommand() {
         taskService.getAllTasks().forEach(System.out::println);
     }
 
     //не уверен в адекватности реализации
-    private static void handleEditCommand() {
+    private void handleEditCommand() {
         System.out.println("Enter task id:");
         int id = Integer.parseInt(scanner.nextLine());
 
@@ -108,19 +113,19 @@ public class Main {
         );
     }
 
-    private static void handleDeleteCommand() {
+    private void handleDeleteCommand() {
         System.out.println("Enter task id:");
         int id = Integer.parseInt(scanner.nextLine());
         taskService.deleteTaskById(id);
     }
 
-    private static void handleFilterCommand() {
+    private void handleFilterCommand() {
         System.out.println("Enter the task status for the filter of 'TODO, IN_PROGRESS, COMPLETED':");
         TaskStatus status = TaskStatus.valueOf(scanner.nextLine());
         taskService.getTasksByStatus(status).forEach(System.out::println);
     }
 
-    private static void handleSortCommand() {
+    private void handleSortCommand() {
         System.out.println("Enter 'status' if you want to sort by status or enter 'date' if you want to sort by date:");
         String sortBy = scanner.nextLine();
         System.out.println("Sort in 'ascending' or 'descending' order:");
