@@ -82,8 +82,8 @@ public class ConsoleListener {
         taskService.editTask(id, newName, newDescription, newStatus, newDueDate);
     }
 
-    private Optional<String> askForString(String prompt) {
-        System.out.println(prompt);
+    private Optional<String> askForString(String text) {
+        System.out.println(text);
         String input = scanner.nextLine();
         if (input.isEmpty()) {
             return Optional.empty();
