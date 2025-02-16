@@ -1,6 +1,7 @@
 package org.ru.dodonov.task;
 
 import org.ru.dodonov.SortOrder;
+import org.ru.dodonov.TaskSortCriteria;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class TaskService {
 
     public List<Task> getTasksByStatus(TaskStatus status) {
         List<Task> filteredTasks = tasks.stream()
-                .filter(task -> task.getStatus().equals(status))
+                .filter(task -> task.getStatus() == status)
                 .toList();
         if (filteredTasks.isEmpty()) {
             System.out.println("No tasks found.");
@@ -79,15 +80,19 @@ public class TaskService {
         return filteredTasks;
     }
 
-    public void sortTasksByStatus(SortOrder order) {
-        Comparator<Task> comparator = Comparator.comparing(Task::getStatus);
-        if (order.equals(SortOrder.DESCENDING)) comparator = comparator.reversed();
-        tasks.sort(comparator);
-    }
+    public void sortTasks(TaskSortCriteria criteria, SortOrder order) {
+        Comparator<Task> comparator;
 
-    public void sortTasksByDate(SortOrder order) {
-        Comparator<Task> comparator = Comparator.comparing(Task::getDueDate);
-        if (order.equals(SortOrder.DESCENDING)) comparator = comparator.reversed();
+        if (criteria == TaskSortCriteria.DATE) {
+            comparator = Comparator.comparing(Task::getDueDate);
+        } else {
+            comparator = Comparator.comparing(Task::getStatus);
+        }
+
+        if (order == SortOrder.DESCENDING) {
+            comparator = comparator.reversed();
+        }
+
         tasks.sort(comparator);
     }
 }

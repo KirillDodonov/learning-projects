@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ru.dodonov.SortOrder;
+import org.ru.dodonov.TaskSortCriteria;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,30 +19,24 @@ public class TaskServiceTest {
     @BeforeEach
     public void setUp() {
         taskService = new TaskService();
+
+        taskService.addTask("Task 1", "Description 1", LocalDate.now().plusDays(100));
+        taskService.addTask("Task 2", "Description 2", LocalDate.now().plusDays(10000));
+        taskService.addTask("Task 3", "Description 3", LocalDate.now().plusDays(10));
+        taskService.addTask("Task 4", "Description 4", LocalDate.now().plusDays(1000));
     }
 
     @Test
     public void addTask() {
-        taskService.addTask("Task 1", "Description 1", LocalDate.now().plusDays(100));
-        taskService.addTask("Task 2", "Description 2", LocalDate.now().plusDays(1000));
+        taskService.addTask("Task 5", "Description 5", LocalDate.now().plusDays(100));
 
         List<Task> tasks = taskService.getAllTasks();
-        assertEquals(2, tasks.size());
-        assertEquals(0, tasks.get(0).getId());
-        assertEquals(1, tasks.get(1).getId());
-    }
-
-    @Test
-    public void getAllTasks() {
-        addTask(); //Третий и второй пункт из вопроса в тг
-        assertEquals(2, taskService.getAllTasks().size());
+        assertEquals(5, tasks.size());
+        assertEquals(4, tasks.get(4).getId());
     }
 
     @Test
     public void editTasks() {
-        taskService.addTask("Task 1", "Description 1", LocalDate.now().plusDays(100));
-        taskService.addTask("Task 2", "Description 2", LocalDate.now().plusDays(100));
-
         taskService.editTask(0,
                 Optional.of("Updated 1"),
                 Optional.of("Updated 1"),
@@ -60,34 +55,35 @@ public class TaskServiceTest {
         Task firstTask = tasks.get(0);
         Task secondTask = tasks.get(1);
 
-        Assertions.assertEquals("Updated 1", firstTask.getName());
-        Assertions.assertEquals("Updated 1", firstTask.getDescription());
-        Assertions.assertEquals(TaskStatus.COMPLETED, firstTask.getStatus());
-        Assertions.assertEquals(LocalDate.now().plusDays(10000), firstTask.getDueDate());
+        Task expectedFirstTask = new Task(
+                0,
+                "Updated 1",
+                "Updated 1",
+                TaskStatus.COMPLETED,
+                LocalDate.now().plusDays(10000)
+        );
+        Task expectedSecondTask = new Task(
+                1,
+                "Updated 2",
+                "Description 2",
+                TaskStatus.TODO,
+                LocalDate.now().plusDays(10000)
+        );
 
-        Assertions.assertEquals("Updated 2", secondTask.getName());
-        Assertions.assertEquals("Description 2", secondTask.getDescription());
-        Assertions.assertEquals(TaskStatus.TODO, secondTask.getStatus());
-        Assertions.assertEquals(LocalDate.now().plusDays(100), secondTask.getDueDate());
+        Assertions.assertEquals(expectedFirstTask, firstTask);
+        Assertions.assertEquals(expectedSecondTask, secondTask);
     }
 
     @Test
     public void deleteTaskById() {
-        taskService.addTask("Task 1", "Description 1", LocalDate.now().plusDays(100));
-        taskService.addTask("Task 2", "Description 2", LocalDate.now().plusDays(1000));
-
         taskService.deleteTaskById(0);
-        assertEquals(1, taskService.getAllTasks().size());
+
+        assertEquals(3, taskService.getAllTasks().size());
         assertEquals("Task 2", taskService.getAllTasks().get(0).getName());
     }
 
     @Test
     public void getTasksByStatus() {
-        taskService.addTask("Task 1", "Description 1", LocalDate.now().plusDays(100));
-        taskService.addTask("Task 2", "Description 2", LocalDate.now().plusDays(100));
-        taskService.addTask("Task 3", "Description 3", LocalDate.now().plusDays(100));
-        taskService.addTask("Task 4", "Description 4", LocalDate.now().plusDays(100));
-
         taskService.editTask(1,
                 Optional.of("Updated 1"),
                 Optional.empty(),
@@ -115,9 +111,6 @@ public class TaskServiceTest {
 
     @Test
     public void sortTasksByStatusInAscendingOrder() {
-        taskService.addTask("Task 1", "Description 1", LocalDate.now().plusDays(10));
-        taskService.addTask("Task 2", "Description 2", LocalDate.now().plusDays(10));
-        taskService.addTask("Task 3", "Description 3", LocalDate.now().plusDays(10));
 
         taskService.editTask(0,
                 Optional.empty(),
@@ -140,12 +133,12 @@ public class TaskServiceTest {
                 Optional.empty()
         );
 
-        taskService.sortTasksByStatus(SortOrder.ASCENDING);
+        taskService.sortTasks(TaskSortCriteria.STATUS, SortOrder.ASCENDING);
 
         List<Task> tasks = taskService.getAllTasks();
-        Assertions.assertEquals(TaskStatus.TODO, tasks.get(0).getStatus());
-        Assertions.assertEquals(TaskStatus.IN_PROGRESS, tasks.get(1).getStatus());
-        Assertions.assertEquals(TaskStatus.COMPLETED, tasks.get(2).getStatus());
+        Assertions.assertEquals(TaskStatus.TODO, tasks.getFirst().getStatus());
+        Assertions.assertEquals(TaskStatus.IN_PROGRESS, tasks.get(2).getStatus());
+        Assertions.assertEquals(TaskStatus.COMPLETED, tasks.getLast().getStatus());
     }
 
     @Test
@@ -175,7 +168,7 @@ public class TaskServiceTest {
                 Optional.empty()
         );
 
-        taskService.sortTasksByStatus(SortOrder.DESCENDING);
+        taskService.sortTasks(TaskSortCriteria.STATUS, SortOrder.DESCENDING);
 
         List<Task> tasks = taskService.getAllTasks();
         Assertions.assertEquals(TaskStatus.COMPLETED, tasks.get(0).getStatus());
@@ -185,27 +178,19 @@ public class TaskServiceTest {
 
     @Test
     public void sortTasksByDateInAscendingOrder() {
-        taskService.addTask("Task 1", "Description 1", LocalDate.now().plusDays(100));
-        taskService.addTask("Task 2", "Description 2", LocalDate.now().plusDays(10000));
-        taskService.addTask("Task 3", "Description 3", LocalDate.now().plusDays(10));
-        taskService.addTask("Task 4", "Description 4", LocalDate.now().plusDays(1000));
-        taskService.sortTasksByDate(SortOrder.ASCENDING);
+        taskService.sortTasks(TaskSortCriteria.DATE, SortOrder.ASCENDING);
 
         List<Task> tasks = taskService.getAllTasks();
-        Assertions.assertEquals(LocalDate.now().plusDays(10), tasks.get(0).getDueDate());
-        Assertions.assertEquals(LocalDate.now().plusDays(10000), tasks.get(3).getDueDate());
+        Assertions.assertEquals(LocalDate.now().plusDays(10), tasks.getFirst().getDueDate());
+        Assertions.assertEquals(LocalDate.now().plusDays(10000), tasks.getLast().getDueDate());
     }
 
     @Test
     public void sortTasksByDateInDescendingOrder() {
-        taskService.addTask("Task 1", "Description 1", LocalDate.now().plusDays(100));
-        taskService.addTask("Task 2", "Description 2", LocalDate.now().plusDays(10000));
-        taskService.addTask("Task 3", "Description 3", LocalDate.now().plusDays(10));
-        taskService.addTask("Task 4", "Description 4", LocalDate.now().plusDays(1000));
-        taskService.sortTasksByDate(SortOrder.DESCENDING);
+        taskService.sortTasks(TaskSortCriteria.DATE, SortOrder.DESCENDING);
 
         List<Task> tasks = taskService.getAllTasks();
-        Assertions.assertEquals(LocalDate.now().plusDays(10000), tasks.get(0).getDueDate());
-        Assertions.assertEquals(LocalDate.now().plusDays(10), tasks.get(3).getDueDate());
+        Assertions.assertEquals(LocalDate.now().plusDays(10000), tasks.getFirst().getDueDate());
+        Assertions.assertEquals(LocalDate.now().plusDays(10), tasks.getLast().getDueDate());
     }
 }

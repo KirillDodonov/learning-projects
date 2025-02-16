@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class Task {
     private int id;
     private String name;
