@@ -98,7 +98,7 @@ public class TaskService {
 
     public List<Task> getUserTasksSorted(
             TaskSortCriteria criteria,
-            SortOrder order
+            TaskSortOrder order
     ) {
         Comparator<Task> comparator;
 
@@ -108,7 +108,7 @@ public class TaskService {
             comparator = Comparator.comparing(Task::status);
         }
 
-        if (order == SortOrder.DESCENDING) {
+        if (order == TaskSortOrder.DESC) {
             comparator = comparator.reversed();
         }
         List<Task> tasks = getUserTasks();

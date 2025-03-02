@@ -75,14 +75,14 @@ public class TaskController {
         List<Task> tasks = taskService.getUserTasksByStatus(status);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(tasks.stream()
-                    .map(dtoMapper::toDto)
-                    .toList());
+                        .map(dtoMapper::toDto)
+                        .toList());
     }
 
     @GetMapping("/my/sorted")
     public ResponseEntity<List<TaskDto>> getUserTasksSorted(
             @RequestParam TaskSortCriteria criteria,
-            @RequestParam SortOrder order
+            @RequestParam TaskSortOrder order
     ) {
         List<Task> tasks = taskService.getUserTasksSorted(criteria, order);
         return ResponseEntity.status(HttpStatus.OK)
