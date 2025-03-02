@@ -1,4 +1,4 @@
-package ru.dodonov.user;
+package ru.dodonov.user.api;
 
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.dodonov.user.domain.UserService;
+import ru.dodonov.user.domain.User;
 
 @RestController
 @RequestMapping("/users")

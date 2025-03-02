@@ -1,8 +1,13 @@
-package ru.dodonov.user;
+package ru.dodonov.user.domain;
 
-import jakarta.validation.Valid;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.dodonov.user.api.SignInUpRequest;
+import ru.dodonov.user.db.UserEntity;
+import ru.dodonov.user.db.UserEntityMapper;
+import ru.dodonov.user.db.UserRepository;
 
 @Service
 public class UserService {
@@ -24,11 +29,23 @@ public class UserService {
     public User registerUser(SignInUpRequest request) {
         UserEntity userToSave = new UserEntity(
                 null,
-                request.username(),
+                request.login(),
+                UserRole.USER,
                 passwordEncoder.encode(request.password())
         );
         UserEntity savedUser = userRepository.save(userToSave);
 
         return entityMapper.toDomain(savedUser);
+    }
+
+    public User getUserByLogin(String login) {
+        UserEntity user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new EntityNotFoundException("User with login %s not found"
+                        .formatted(login)));
+        return entityMapper.toDomain(user);
+    }
+
+    public boolean isUserExistsByLogin(String login) {
+        return userRepository.findByLogin(login).isPresent();
     }
 }

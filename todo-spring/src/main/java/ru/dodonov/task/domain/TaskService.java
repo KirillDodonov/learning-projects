@@ -1,16 +1,14 @@
 package ru.dodonov.task.domain;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import ru.dodonov.task.api.TaskDto;
 import ru.dodonov.task.db.TaskEntity;
 import ru.dodonov.task.db.TaskEntityMapper;
 import ru.dodonov.task.db.TaskRepository;
-import ru.dodonov.user.CurrentUserProvider;
-import ru.dodonov.user.User;
-import ru.dodonov.user.UserRepository;
+import ru.dodonov.user.domain.AuthenticationService;
+import ru.dodonov.user.domain.User;
+import ru.dodonov.user.db.UserRepository;
 
 import javax.swing.*;
 import java.util.Comparator;
@@ -21,18 +19,16 @@ import java.util.Optional;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskEntityMapper entityMapper;
-    private final CurrentUserProvider userProvider;
-    private final UserRepository userRepository;
+    private final AuthenticationService userProvider;
 
     public TaskService(
             TaskRepository taskRepository,
-            TaskEntityMapper entityMapper, CurrentUserProvider userProvider,
+            TaskEntityMapper entityMapper, AuthenticationService userProvider,
             UserRepository userRepository
     ) {
         this.taskRepository = taskRepository;
         this.entityMapper = entityMapper;
         this.userProvider = userProvider;
-        this.userRepository = userRepository;
     }
 
     public TaskEntity findTaskById(Long taskId) {
@@ -46,7 +42,7 @@ public class TaskService {
             throw new IllegalArgumentException("Can not create location with provided id. Id Must be empty");
         }
 
-        User user = userProvider.getCurrentUser();
+        User user = userProvider.getCurrentAuthenticatedUser();
 
         TaskEntity entity = new TaskEntity(
                 null,
@@ -85,7 +81,7 @@ public class TaskService {
     }
 
     public List<Task> getUserTasks() {
-        User user = userProvider.getCurrentUser();
+        User user = userProvider.getCurrentAuthenticatedUser();
         return taskRepository.findAllByOwnerId(user.Id())
                 .stream()
                 .map(entityMapper::toDomain)
@@ -93,7 +89,7 @@ public class TaskService {
     }
 
     public List<Task> getUserTasksByStatus(TaskStatus status) {
-        User user = userProvider.getCurrentUser();
+        User user = userProvider.getCurrentAuthenticatedUser();
         return taskRepository.findAllByOwnerIdAndStatus(user.Id(), status)
                 .stream()
                 .map(entityMapper::toDomain)

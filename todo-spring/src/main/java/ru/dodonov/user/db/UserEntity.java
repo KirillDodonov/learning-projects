@@ -1,7 +1,8 @@
-package ru.dodonov.user;
+package ru.dodonov.user.db;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.dodonov.user.domain.UserRole;
 
 @Entity
 @Table(name = "Users")
@@ -19,7 +20,11 @@ public class UserEntity {
     Long id;
 
     @Column(unique = true, name = "login")
-    String username;
+    String login;
+
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    UserRole role;
 
     @Column(name = "passwordHash")
     String passwordHash;
