@@ -7,37 +7,47 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.dodonov.user.domain.AuthenticationService;
+import ru.dodonov.user.domain.UserRegistrationService;
 import ru.dodonov.user.domain.UserService;
 import ru.dodonov.user.domain.User;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final UserService userService;
+    private final UserRegistrationService regService;
+    private final AuthenticationService authService;
+    private final UserDtoMapper dtoMapper;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(
+            UserRegistrationService regService,
+            AuthenticationService authService,
+            UserDtoMapper dtoMapper
+    ) {
+        this.regService = regService;
+        this.authService = authService;
+        this.dtoMapper = dtoMapper;
     }
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(
             @RequestBody @Valid SignInUpRequest request
     ) {
-        User registeredUser = userService.registerUser(request);
+        User registeredUser = regService.registerUser(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(null);
+                .body(dtoMapper.toDto(registeredUser));
     }
 
     @PostMapping("/auth")
-    public ResponseEntity<UserDto> loginUser(
+    public ResponseEntity<String> loginUser(
             @RequestBody @Valid SignInUpRequest request
     ) {
-//        User registeredUser = userService.authenticateUser(request);
+        String jwtToken = authService.authenticateUser(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(null);
+                .body(jwtToken);
     }
 }

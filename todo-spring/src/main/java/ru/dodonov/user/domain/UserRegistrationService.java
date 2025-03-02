@@ -1,7 +1,5 @@
 package ru.dodonov.user.domain;
 
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.dodonov.user.api.SignInUpRequest;
@@ -10,26 +8,30 @@ import ru.dodonov.user.db.UserEntityMapper;
 import ru.dodonov.user.db.UserRepository;
 
 @Service
-public class UserService {
+public class UserRegistrationService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final UserEntityMapper entityMapper;
 
-    public UserService(
+    public UserRegistrationService(
             UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
             UserEntityMapper entityMapper
     ) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
         this.entityMapper = entityMapper;
     }
 
-    public User getUserByLogin(String login) {
-        UserEntity user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new EntityNotFoundException("User with login %s not found"
-                        .formatted(login)));
-        return entityMapper.toDomain(user);
-    }
+    public User registerUser(SignInUpRequest request) {
+        UserEntity userToSave = new UserEntity(
+                null,
+                request.login(),
+                UserRole.USER,
+                passwordEncoder.encode(request.password())
+        );
+        UserEntity savedUser = userRepository.save(userToSave);
 
-    public boolean isUserExistsByLogin(String login) {
-        return userRepository.findByLogin(login).isPresent();
+        return entityMapper.toDomain(savedUser);
     }
 }
