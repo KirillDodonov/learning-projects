@@ -3,8 +3,6 @@ package ru.dodonov.task.db;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.dodonov.task.domain.TaskStatus;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity

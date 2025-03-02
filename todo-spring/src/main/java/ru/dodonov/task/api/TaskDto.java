@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public record TaskDto (
         Long id,
         Long ownerId,
-        @NotBlank(message = "Location name should be not blank")
+        @NotBlank(message = "Name can not be blank")
         String name,
         String description,
         TaskStatus status,

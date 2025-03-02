@@ -47,7 +47,7 @@ public class UserController {
         String jwtToken = authService.authenticateUser(request);
 
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .body(jwtToken);
     }
 }

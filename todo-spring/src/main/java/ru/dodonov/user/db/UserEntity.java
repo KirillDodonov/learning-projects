@@ -26,6 +26,6 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     UserRole role;
 
-    @Column(name = "passwordHash")
+    @Column(name = "password_hash")
     String passwordHash;
 }
