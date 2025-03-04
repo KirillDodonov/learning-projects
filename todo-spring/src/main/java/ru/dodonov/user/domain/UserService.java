@@ -1,10 +1,7 @@
 package ru.dodonov.user.domain;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.NotBlank;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.dodonov.user.api.SignInUpRequest;
 import ru.dodonov.user.db.UserEntity;
 import ru.dodonov.user.db.UserEntityMapper;
 import ru.dodonov.user.db.UserRepository;

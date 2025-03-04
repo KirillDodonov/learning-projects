@@ -16,8 +16,7 @@ import ru.dodonov.user.domain.UserService;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -70,4 +69,37 @@ public class UserServiceTest {
         assertEquals("User with login " + login + " not found", exception.getMessage());
         verifyNoInteractions(entityMapper);
     }
+
+    @Test
+    void isUserExistsByLogin_ValidLogin_ReturnsTrue() {
+        String login = "testLogin";
+
+        when(userRepository.findByLogin(login)).thenReturn(Optional.of(mock(UserEntity.class)));
+
+        boolean result = userService.isUserExistsByLogin(login);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void isUserExistsByLogin_UserNotExists_ReturnsFalse() {
+        String login = "incorrectLogin";
+
+        when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
+
+        boolean result = userService.isUserExistsByLogin(login);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void isUserExistsByLogin_WhenLoginIsNull_ReturnsFalse() {
+        when(userRepository.findByLogin(null)).thenReturn(Optional.empty());
+
+        boolean result = userService.isUserExistsByLogin(null);
+
+        assertFalse(result);
+        verify(userRepository).findByLogin(null);
+    }
+
 }
