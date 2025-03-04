@@ -7,7 +7,7 @@ import ru.dodonov.user.domain.User;
 public class UserDtoMapper {
     public UserDto toDto(User user) {
         return new UserDto(
-                user.Id(),
+                user.id(),
                 user.login(),
                 user.role()
         );

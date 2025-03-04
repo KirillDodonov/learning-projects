@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.dodonov.user.domain.AuthenticationService;
 import ru.dodonov.user.domain.UserRegistrationService;
-import ru.dodonov.user.domain.UserService;
 import ru.dodonov.user.domain.User;
 
 @RestController

@@ -46,7 +46,7 @@ public class TaskService {
 
         TaskEntity entity = new TaskEntity(
                 null,
-                user.Id(),
+                user.id(),
                 taskToCreate.name(),
                 taskToCreate.description(),
                 TaskStatus.TODO,
@@ -82,7 +82,7 @@ public class TaskService {
 
     public List<Task> getUserTasks() {
         User user = userProvider.getCurrentAuthenticatedUser();
-        return taskRepository.findAllByOwnerId(user.Id())
+        return taskRepository.findAllByOwnerId(user.id())
                 .stream()
                 .map(entityMapper::toDomain)
                 .toList();
@@ -90,7 +90,7 @@ public class TaskService {
 
     public List<Task> getUserTasksByStatus(TaskStatus status) {
         User user = userProvider.getCurrentAuthenticatedUser();
-        return taskRepository.findAllByOwnerIdAndStatus(user.Id(), status)
+        return taskRepository.findAllByOwnerIdAndStatus(user.id(), status)
                 .stream()
                 .map(entityMapper::toDomain)
                 .toList();

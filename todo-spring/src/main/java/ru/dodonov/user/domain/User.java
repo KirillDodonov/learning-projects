@@ -2,7 +2,7 @@ package ru.dodonov.user.domain;
 
 
 public record User(
-        Long Id,
+        Long id,
         String login,
         UserRole role,
         String passwordHash
