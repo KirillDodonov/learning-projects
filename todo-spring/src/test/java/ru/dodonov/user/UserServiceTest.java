@@ -28,7 +28,7 @@ public class UserServiceTest {
     private UserEntityMapper entityMapper;
 
     @InjectMocks
-    UserService userService;
+    private UserService userService;
 
     @Test
     void getUserByLogin_ValidLogin_ReturnsUser() {

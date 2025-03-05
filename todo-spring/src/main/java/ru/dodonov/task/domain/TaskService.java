@@ -8,27 +8,26 @@ import ru.dodonov.task.db.TaskEntityMapper;
 import ru.dodonov.task.db.TaskRepository;
 import ru.dodonov.user.domain.AuthenticationService;
 import ru.dodonov.user.domain.User;
-import ru.dodonov.user.db.UserRepository;
 
-import javax.swing.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskEntityMapper entityMapper;
-    private final AuthenticationService userProvider;
+    private final AuthenticationService authService;
 
     public TaskService(
             TaskRepository taskRepository,
-            TaskEntityMapper entityMapper, AuthenticationService userProvider,
-            UserRepository userRepository
+            TaskEntityMapper entityMapper,
+            AuthenticationService authService
     ) {
         this.taskRepository = taskRepository;
         this.entityMapper = entityMapper;
-        this.userProvider = userProvider;
+        this.authService = authService;
     }
 
     public TaskEntity findTaskById(Long taskId) {
@@ -41,8 +40,7 @@ public class TaskService {
         if (taskToCreate.id() != null) {
             throw new IllegalArgumentException("Can not create location with provided id. Id Must be empty");
         }
-
-        User user = userProvider.getCurrentAuthenticatedUser();
+        User user = authService.getCurrentAuthenticatedUser();
 
         TaskEntity entity = new TaskEntity(
                 null,
@@ -58,9 +56,12 @@ public class TaskService {
     }
 
     public Task updateTask(Long taskId,TaskDto task) {
-        TaskEntity taskToUpdate = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Event entity wasn't found by id=%s"
-                        .formatted(taskId)));
+        User user = authService.getCurrentAuthenticatedUser();
+        TaskEntity taskToUpdate = findTaskById(taskId);
+
+        if (taskToUpdate.getOwnerId() != user.id()) {
+            throw new IllegalArgumentException("Can not update task with provided id. Owner id must be equal");
+        }
 
         Optional.ofNullable(task.name())
                 .ifPresent(taskToUpdate::setName);
@@ -75,21 +76,28 @@ public class TaskService {
         return entityMapper.toDomain(updatedTask);
     }
 
-    public void deleteTask(Long taskId) {
+    public Task deleteTask(Long taskId) {
+        User user = authService.getCurrentAuthenticatedUser();
         TaskEntity taskToDelete = findTaskById(taskId);
+
+        if (taskToDelete.getOwnerId() != user.id()) {
+            throw new IllegalArgumentException("Can not update task with provided id. Owner id must be equal");
+        }
+
         taskRepository.delete(taskToDelete);
+        return entityMapper.toDomain(taskToDelete);
     }
 
     public List<Task> getUserTasks() {
-        User user = userProvider.getCurrentAuthenticatedUser();
+        User user = authService.getCurrentAuthenticatedUser();
         return taskRepository.findAllByOwnerId(user.id())
                 .stream()
                 .map(entityMapper::toDomain)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     public List<Task> getUserTasksByStatus(TaskStatus status) {
-        User user = userProvider.getCurrentAuthenticatedUser();
+        User user = authService.getCurrentAuthenticatedUser();
         return taskRepository.findAllByOwnerIdAndStatus(user.id(), status)
                 .stream()
                 .map(entityMapper::toDomain)

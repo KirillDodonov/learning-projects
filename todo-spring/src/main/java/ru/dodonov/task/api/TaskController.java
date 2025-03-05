@@ -47,14 +47,14 @@ public class TaskController {
     }
 
     @DeleteMapping("/{taskId}")
-    public ResponseEntity<Void> deleteTask(
+    public ResponseEntity<TaskDto> deleteTask(
             @PathVariable Long taskId
     ) {
-        taskService.deleteTask(taskId);
+        Task deletedTask = taskService.deleteTask(taskId);
 
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
-                .build();
+                .body(dtoMapper.toDto(deletedTask));
     }
 
     @GetMapping("/my")

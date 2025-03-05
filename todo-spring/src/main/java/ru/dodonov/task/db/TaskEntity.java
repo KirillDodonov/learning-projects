@@ -18,21 +18,21 @@ public class TaskEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    Long id;
+    private Long id;
 
     @Column(name = "owner_id")
-    Long ownerId;
+    private Long ownerId;
 
     @Column(name = "name")
-    String name;
+    private String name;
 
     @Column(name = "description")
-    String description;
+    private String description;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    TaskStatus status;
+    private TaskStatus status;
 
     @Column(name = "due_date")
-    LocalDateTime dueDate;
+    private LocalDateTime dueDate;
 }

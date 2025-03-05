@@ -1,6 +1,7 @@
 package ru.dodonov.exception;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,26 +15,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorMessageResponse> handleCommonException(Exception exception) {
-        ErrorMessageResponse messageResponse = new ErrorMessageResponse(
-                "Internal error",
-                exception.getMessage(),
-                LocalDateTime.now()
-        );
-
-        return ResponseEntity.status(500)
-                .body(messageResponse);
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal error", exception);
     }
 
     @ExceptionHandler(value = EntityNotFoundException.class)
     public ResponseEntity<ErrorMessageResponse> handleNotFound(Exception exception) {
-        ErrorMessageResponse messageResponse = new ErrorMessageResponse(
-                "Entity not found",
-                exception.getMessage(),
-                LocalDateTime.now()
-        );
-
-        return ResponseEntity.status(404)
-                .body(messageResponse);
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "Entity not found", exception);
     }
 
     @ExceptionHandler(value = {
@@ -41,25 +28,25 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException.class
     })
     public ResponseEntity<ErrorMessageResponse> handleIllegalArgument(Exception exception) {
-        ErrorMessageResponse messageResponse = new ErrorMessageResponse(
-                "Bad request",
-                exception.getMessage(),
-                LocalDateTime.now()
-        );
-
-        return ResponseEntity.status(400)
-                .body(messageResponse);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad request", exception);
     }
 
     @ExceptionHandler(value = BadCredentialsException.class)
     public ResponseEntity<ErrorMessageResponse> handleBadCredentials(Exception exception) {
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Failed to authenticate", exception);
+    }
+
+    private ResponseEntity<ErrorMessageResponse> buildErrorResponse(
+            HttpStatus status,
+            String title,
+            Exception exception
+    ) {
         ErrorMessageResponse messageResponse = new ErrorMessageResponse(
-                "Failed to authenticate",
+                title,
                 exception.getMessage(),
                 LocalDateTime.now()
         );
 
-        return ResponseEntity.status(401)
-                .body(messageResponse);
+        return ResponseEntity.status(status).body(messageResponse);
     }
 }

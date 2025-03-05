@@ -22,16 +22,16 @@ import static org.mockito.Mockito.*;
 public class AuthenticationServiceTest {
 
     @Mock
-    JwtTokenManager jwtTokenManager;
+    private JwtTokenManager jwtTokenManager;
 
     @Mock
-    UserService userService;
+    private UserService userService;
 
     @Mock
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    AuthenticationService authenticationService;
+    private AuthenticationService authenticationService;
 
     @Test
     void authUser_ValidRequest_ReturnsJwtToken() {
